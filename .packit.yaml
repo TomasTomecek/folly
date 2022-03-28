@@ -22,6 +22,16 @@ jobs:
     - fedora-35-armhfp
     - fedora-35-i386
     - fedora-35-x86_64
+  packit_instances: [stg, prod]  # testing on both deployments
+- job: copr_build  # epel-next only makes sense for el{8,9}, it's 404 on Fedora
+  trigger: pull_request
+  metadata:
+    targets:
+    - centos-stream-8
+    - centos-stream-9
+    additional_repos:
+    - https://mirrors.fedoraproject.org/metalink?repo=epel-next-$releasever&arch=$basearch
+  packit_instances: [stg, prod]  # testing on both deployments
 
 - job: copr_build
   trigger: release
