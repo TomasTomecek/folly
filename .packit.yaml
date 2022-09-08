@@ -5,13 +5,18 @@ specfile_path: folly.spec
 
 upstream_package_name: folly
 downstream_package_name: folly
+srpm_build_deps: ["cmake"]
 
 actions:
-  post-upstream-clone: "bash -c \"git clone -b packit https://pagure.io/meta/folly.git folly-dist-git && mv folly-dist-git/folly*.{spec,patch} .\""
+  post-upstream-clone:
+  - "bash -c \"git clone -b packit https://pagure.io/meta/folly.git folly-dist-git && mv folly-dist-git/folly*.{spec,patch} .\""
+  - "sed -i folly.spec -e 's/^Patch/# Patch/g'"
+  - "sed -i folly.spec -e 's/^%patch/# %patch/g'"
 
 jobs:
 - job: copr_build
   trigger: pull_request
+  identifier: fedora
   metadata:
     targets:
     - fedora-development-aarch64
@@ -22,6 +27,14 @@ jobs:
     - fedora-35-armhfp
     - fedora-35-i386
     - fedora-35-x86_64
+- job: copr_build  # epel-next only makes sense for el{8,9}, it's 404 on Fedora
+  trigger: pull_request
+  identifier: stream
+  metadata:
+    targets:
+    - centos-stream-9
+    additional_repos:
+    - https://mirror.fcix.net/epel/next/9/Everything/x86_64/
 
 - job: copr_build
   trigger: release
